@@ -6,6 +6,7 @@
  * [5. Multiprocessor Scheduling]([Operating_System]/[Operating_System]5_Multiprocessor_Scheduling.md)
 * [컴퓨터구조론]
  * [1. 컴퓨터추상화 및 관련기술]([Computer_Architecture]/[Computer_Architecture]1_Computer_Abstractions_And_Technology.md)
+ * [2. 명령어: 컴퓨터 언어]([Computer_Architecture]/[Computer_Architecture]2_Instructions_of_the_Computer.md)
 * [데이터통신]
  * [1. Overview]([Data_Communication]/[Data_Communication]1_Overview.md)
  * [2. Protocol Architecture]([Data_Communication]/[Data_Communication]2_Protocol_Architecture.md)
