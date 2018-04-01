@@ -56,3 +56,87 @@ MIPS 산술 명령어는 반드시 한 종류의 연산만 지시하고 변수 �
 > 상수 0은 또 다른 역할을 하는데, 유용한 여러 변형을 제공한다. 예를들어 복사(move)연산은 피연산자 중 하나가 0인 add 명령어이다. 때문에 MIPS에서는 $zero를 값 0으로 묶어두었다.
 
 ## 9. Representing Instructions
+* instruction들은 기계어로 저장된다.
+* MIPS instruction은 32bit 기준 워드로 표현된다.
+
+> **Register numbers**
+> 레지스터를 사용하기 위해서 이름을 숫자로 매핑한다.
+> - $t0 ~ $t7 : 8 ~ 15
+> - $t8 ~ $t9 : 24 ~ 25
+> - $s0 ~ $s7 : 16 ~ 23
+
+## 10. Sign Extension
+부호와 크기표현에는 몇가지 단점이 있다.
+1. sign bit를 왼쪽에 두어야할지, 오른쪽에 두어야할지에 대한 이슈가 있다.
+2. 덧셈기는 부호를 결정하기 위해 한 단계가 더 필요하다.
+3. 양의 0과 음의 0이 존재한다.
+
+보통 비트 확장시에는 shift되어 생기는 비트 모두 sign bit와 같은 부호로 표시된다. 논리연산일 경우에는 zero extension해준다.
+
+> #### **MIPS instruction set**
+> * addi : extend immediate value
+> * lb/lh : extend loaded byte/halfword
+> * lbu : load byte unsigned
+> * beq/bne : extend the displacement
+> 이런 instruction들이 나오면 sign extension이 필요하다.
+
+## 11. MIPS 32-ISA
+MIPS 명령어의 길이는 데이터워드와 마찬가지로 32비트이다. 명령어에는 다음 6가지 카테고리가 존재한다.
+* Computational
+* Load/Store
+* Jump and Branch
+* Floating Point - coprocessor
+* Memory Management
+* Special
+
+#### MIPS 명령어의 필드
+##### 1. R-format
+`op(5bit)` `rs(5bits)` `rt(5bits)` `rd(5bits)` `shamt(5bits)` `funct(6bits)`
+각 이름의 의미는 다음과 같다.
+* **op** : 명령어가 실행할 연산의 종류로서 연산자라고 부른다.
+* **rs** : 첫번째 source 피연산자 레지스터
+* **rt** : 두번째 source 피연산자 레지스터
+* **rd** : destination 레지스터, 연산 결과가 저장된다.
+* **shamt** : shift 이동량
+* **funct** : op 필드에서 연산의 종류를 표시하고, 여기서는 그중의 한 연산을 구체적으로 지정한다. function code라고 부르기도 한다.
+
+##### 2. I-format
+데이터 전송에 사용되는 instruction format이다.
+
+만약 R-format을 사용할 경우, 필드 길이가 더 길어야 하는 경우에는 문제가 생긴다. 그래서 절반의 16비트를 묶어서 constant or address를 저장하도록 I-format을 만들었다.
+
+#### <span style="color:red">원칙 4 : 좋은 설계에는 적당한 절충이 필요하다.</span>
+
+`op(6bits)` `rs(5bits)` `rt(5bits)` `constant or address(16bits)`
+* **rt** : destination 레지스터, 혹은 source register number
+* **Constant** : –2의15제곱(32768) ~ +2의15제곱–1(32767)
+* **Address** : offset added to base address in rs
+
+R-format과 I-format은 op필드를 보고 명령어의 오른쪽 절반을 필드 세 개로 볼 것인지, 하나로 볼 것인지를 결정한다.
+
+## 12. MIPS의 32비트 수치를 위한 주소지정 및 복잡한 주소지정 방식
+lui(load upper immediate)를 이용한다.
+**step1 >** lui를 이용해서 상위 16비트를 채운다.
+**step2 >** ori를 이용해 하위 16비트를 더한다.
+**step3 >** 원하는 32비트 만큼의 값이 들어간다.
+
+## 13. MIPS의 메모리 접근 instructions
+MIPS는 두가지 기본 데이터 전송 명령어를 가진다.
+1. lw : load word from memory
+2. sw : store word to memory
+
+두 명령어는 5bit으로 레지스터를 가리키며, 각 자리의 비트수를 합하면(오프셋을 포함하여) 32비트가 된다.
+
+이외에도 byte단위로 옮겨주는 명령어도 있다.
+1. lb : load byte from memory
+2. sb : store byte to memory
+
+## 14. MIPS Shift Operation
+* sll : shift left logical
+* srl : shift right logical
+
+## 15. MIPS Logical Operations
+* and
+* or
+* nor
+* not : nor연산에 constant 부분에 $zero를 넣어주면 된다.
